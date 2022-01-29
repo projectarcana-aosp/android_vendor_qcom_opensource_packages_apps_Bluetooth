@@ -311,6 +311,11 @@ public class A2dpService extends ProfileService {
 
         // Step 9: Clear active device and stop playing audio
         removeActiveDevice(true);
+        if (ApmConstIntf.getLeAudioEnabled()) {
+           synchronized (mBtA2dpLock) {
+	    updateAndBroadcastActiveDevice(null);
+        }
+       }
         // Step 8: Mark service as stopped
         setA2dpService(null);
 
@@ -2401,7 +2406,7 @@ public class A2dpService extends ProfileService {
         public BluetoothDevice getActiveDevice(AttributionSource source) {
             if(ApmConstIntf.getLeAudioEnabled()) {
                 ActiveDeviceManagerServiceIntf activeDeviceManager = ActiveDeviceManagerServiceIntf.get();
-                return activeDeviceManager.getActiveDevice(ApmConstIntf.AudioFeatures.MEDIA_AUDIO);
+                return activeDeviceManager.getActiveAbsoluteDevice(ApmConstIntf.AudioFeatures.MEDIA_AUDIO);
             }
             A2dpService service = getService(source);
             if (service == null) {
